@@ -64,6 +64,21 @@ def accuracy(predicted_labels, true_labels):
 
 def main():
     # Take in text files and outputs sentiment scores
+    test_data = []
+    training_data = []
+
+    with open('testSet.text', 'r') as f:
+        test_data = f.read()
+
+    with open('trainingSet.text', 'r') as f:
+        training_data = f.read()
+        
+    processed_test_data = process_text(test_data)
+    training_test_data = process_text(training_data)
+
+    processed_test_vocab = build_vocab(processed_test_data)
+    training_test_vocab = build_vocab(training_test_data)
+    
 
     return 1
 
