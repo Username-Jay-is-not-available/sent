@@ -1,5 +1,5 @@
 # This file implements a Naive Bayes Classifier
-
+import math
 
 class BayesClassifier():
     """
@@ -23,13 +23,62 @@ class BayesClassifier():
         train_labels: vectorized labels
         vocab: vocab from build_vocab
         """
-        return 1
+        total_positive_words = 0
+        total_negative_words = 0
+        total_positive_sentences = 0
+        total_negative_sentences = 0
 
+        for sentence, label in zip(train_data, train_labels):
+            if label == 1:
+                total_positive_sentences += 1
+                for word in sentence:
+                    if word not in self.postive_word_counts:
+                        self.postive_word_counts[word] = 0
+                    self.postive_word_counts[word] += 1
+                    total_positive_words += 1
+            else:
+                total_negative_sentences += 1
+                for word in sentence:
+                    if word not in self.negative_word_counts:
+                        self.negative_word_counts[word] = 0
+                    self.negative_word_counts[word] += 1
+                    total_negative_words += 1
+
+        self.percent_positive_scentences = total_positive_sentences / (total_positive_sentences + total_negative_sentences)
+        self.percent_negative_scentences = total_negative_sentences / (total_positive_sentences + total_negative_sentences)
+
+        for word in vocab:
+            if word not in self.postive_word_counts:
+                self.postive_word_counts[word] = 0
+            if word not in self.negative_word_counts:
+                self.negative_word_counts[word] = 0
+
+        self.total_positive_words = total_positive_words
+        self.total_negative_words = total_negative_words
+        self.vocabulary_length = len(vocab)
 
     def classify_text(self, vectors, vocab):
         """
         vectors: [vector1, vector2, ...]
         predictions: [0, 1, ...]
         """
+        predictions = []
+
+        for sentence in vectors:
+            log_positive_probability = math.log(self.percent_positive_scentences)
+            log_negative_probability = math.log(self.percent_negative_scentences)
+
+            for word in sentence:
+                word_positive_probability = (self.postive_word_counts[word] + 1) / (self.total_positive_words + self.vocabulary_length)
+                word_negative_probability = (self.negative_word_counts[word] + 1) / (self.total_negative_words + self.vocabulary_length)
+
+                log_positive_probability += math.log(word_positive_probability)
+                log_negative_probability += math.log(word_negative_probability)
+
+            if log_positive_probability > log_negative_probability:
+                predictions.append(1)
+            else:
+                predictions.append(0)
+
         return predictions
     
