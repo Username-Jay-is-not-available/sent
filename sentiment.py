@@ -2,7 +2,9 @@
 # This file contains the processing functions
 import string
 import re
-import classifier
+import numpy as np
+from collections import Counter
+from classifier import BayesClassifier
 
 def process_text(text):
     """
@@ -22,7 +24,8 @@ def build_vocab(preprocessed_text):
     preprocessed_text: output from process_text
     Returns unique text tokens
     """
-    vocab = sorted(set(preprocessed_text))  
+    #removed duplicated words from preprocessed_text and sorted it
+    vocab = sorted(set(preprocessed_text))
     return vocab
 
 
@@ -34,15 +37,30 @@ def vectorize_text(text, vocab):
     Returns the vectorized text and the labels
     """
     vectorized_text = []
-    for str in vocab:
-        if str in text:
-            vectorized_text.append('1')
-        else:
-            vectorized_text.append('0')
+    labels = []
+    
+    # Split the text into sentences
+    sentences = text.split('\n')
+    
+    for sentence in sentences:
+        # Skip empty lines
+        if not sentence.strip():
+            continue
 
+        # Split the sentence into words and label
+        try:
+            words, label = sentence.split('\t')
+        except ValueError:
+            print(f"Skipping malformed sentence: {sentence}")
+            continue
 
-    label = text[-1]
-    return vectorized_text, label
+        # Convert the sentence to a vector
+        vector = [word for word in process_text(words) if word in vocab]
+        
+        vectorized_text.append(vector)
+        labels.append(int(label))
+    
+    return vectorized_text, labels
 
 
 def accuracy(predicted_labels, true_labels):
@@ -64,20 +82,26 @@ def accuracy(predicted_labels, true_labels):
 
 def main():
     # Take in text files and outputs sentiment scores
-    test_data = []
-    training_data = []
 
-    with open('testSet.text', 'r') as f:
+    with open('trainingSet.txt', 'r') as f:
+        training_data = f.read()
+
+    with open('testSet.txt', 'r') as f:
         test_data = f.read()
 
-    with open('trainingSet.text', 'r') as f:
-        training_data = f.read()
-        
-    processed_test_data = process_text(test_data)
-    training_test_data = process_text(training_data)
+    preprocessed_training_data = process_text(training_data)
 
-    processed_test_vocab = build_vocab(processed_test_data)
-    training_test_vocab = build_vocab(training_test_data)
+    vocab = build_vocab(preprocessed_training_data)
+
+    vectorized_training_data, training_labels = vectorize_text(training_data, vocab)
+    vectorized_test_data, test_labels = vectorize_text(test_data, vocab)
+
+    classifier = BayesClassifier()
+    classifier.train(vectorized_training_data, training_labels, vocab)
+
+    predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
+    
+    print("Accuracy: ", accuracy(predicted_labels, test_labels))
     
 
     return 1
