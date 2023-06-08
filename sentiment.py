@@ -112,7 +112,7 @@ def main():
         
         print(f"Accuracy on trainingSet parts 1-{i+1}: ", accuracy(predicted_training_labels, training_labels), file=open('results.txt', 'a'))
 
-        print(f"Accuracy on testSet parts 1-{i+1}: ", accuracy(predicted_testing_labels, test_labels), file=open('results.txt', 'a'))
+        print(f"Accuracy on testSet parts 1-{i+1}: ", accuracy(predicted_testing_labels, test_labels), file=open('testSet.txt', 'a'))
 
     return 1
 
