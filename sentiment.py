@@ -101,6 +101,7 @@ def main():
 
     predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
     
+    # https://www.askpython.com/python/built-in-methods/python-print-to-file
     print("Accuracy: ", accuracy(predicted_labels, test_labels), file=open('results.txt', 'a'))
     
 
