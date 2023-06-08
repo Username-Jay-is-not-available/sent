@@ -110,9 +110,9 @@ def main():
         
         predicted_testing_labels = classifier.classify_text(vectorized_test_data, vocab)
         
-        print(f"Accuracy on trainingSet parts 1-{i+1}: ", accuracy(predicted_training_labels, training_labels), file=open('output.txt', 'a'))
+        print(f"Accuracy on trainingSet parts 1-{i+1}: ", accuracy(predicted_training_labels, training_labels), file=open('results.txt', 'a'))
 
-        print(f"Accuracy on testSet parts 1-{i+1}: ", accuracy(predicted_testing_labels, test_labels), file=open('output.txt', 'a'))
+        print(f"Accuracy on testSet parts 1-{i+1}: ", accuracy(predicted_testing_labels, test_labels), file=open('results.txt', 'a'))
 
     return 1
 
