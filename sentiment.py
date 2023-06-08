@@ -97,12 +97,23 @@ def main():
     vectorized_test_data, test_labels = vectorize_text(test_data, vocab)
 
     classifier = BayesClassifier()
-    classifier.train(vectorized_training_data, training_labels, vocab)
+    
+    #Is this how you do partitions?
+    for x in vectorized_training_data.file_sections: 
+            classifier.train(x, training_labels, vocab)
 
-    predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
+            predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
+    
+            # https://www.askpython.com/python/built-in-methods/python-print-to-file
+            print("Accuracy: ", accuracy(predicted_labels, test_labels), file=open('results.txt', 'a'))
+    
+    
+    #classifier.train(vectorized_training_data, training_labels, vocab)
+
+    #predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
     
     # https://www.askpython.com/python/built-in-methods/python-print-to-file
-    print("Accuracy: ", accuracy(predicted_labels, test_labels), file=open('results.txt', 'a'))
+    #print("Accuracy: ", accuracy(predicted_labels, test_labels), file=open('results.txt', 'a'))
     
 
     return 1
