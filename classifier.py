@@ -13,7 +13,7 @@ class BayesClassifier():
         self.percent_positive_scentences = 0
         self.percent_negative_scentences = 0
         self.file_length = 499
-        self.file_sections = [self.file_length // 4, self.file_length // 3, self.file_length // 2]
+        self.file_sections = [self.file_length // 4, self.file_length // 2, self.file_length // (4/3), self.file_length]
 
 
     def train(self, train_data, train_labels, vocab):
