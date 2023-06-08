@@ -96,24 +96,32 @@ def main():
     vectorized_training_data, training_labels = vectorize_text(training_data, vocab)
     vectorized_test_data, test_labels = vectorize_text(test_data, vocab)
 
+    # Divide the training data into four equal parts
+    parts = len(vectorized_training_data) // 4
+    
     classifier = BayesClassifier()
-    
-    #Is this how you do partitions?
-    for x in vectorized_training_data.file_sections: 
-            classifier.train(x, training_labels, vocab)
 
-            predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
-    
-            # https://www.askpython.com/python/built-in-methods/python-print-to-file
-            print("Accuracy: ", accuracy(predicted_labels, test_labels), file=open('results.txt', 'a'))
-    
-    
-    #classifier.train(vectorized_training_data, training_labels, vocab)
+    for i in range(4):
+        # Concatenate the parts up to and including the i'th part
+        incremental_data = vectorized_training_data[:(i+1)*parts]
+        incremental_labels = training_labels[:(i+1)*parts]
 
-    #predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
-    
-    # https://www.askpython.com/python/built-in-methods/python-print-to-file
-    #print("Accuracy: ", accuracy(predicted_labels, test_labels), file=open('results.txt', 'a'))
+        classifier.train(incremental_data, incremental_labels, vocab)
+
+        predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
+
+        print(f"Accuracy after training on parts 1-{i+1}: ", accuracy(predicted_labels, test_labels))
+        
+    for i, section in enumerate(classifier.file_sections):
+        # Use the section as an index for incremental training
+        incremental_data = vectorized_training_data[:section]
+        incremental_labels = training_labels[:section]
+
+        classifier.train(incremental_data, incremental_labels, vocab)
+
+        predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
+
+        print(f"Accuracy after training on parts 1-{i+1}: ", accuracy(predicted_labels, test_labels))
     
 
     return 1
