@@ -12,8 +12,9 @@ def process_text(text):
     Returns a list of text
     """
     text = text.lower()  # Convert to lower case
-    text = re.sub(r'\d+', '', text)  # Remove digits
-    text = text.translate(str.maketrans('', '', string.punctuation))  # Remove punctuation
+    text = re.sub(r'\W', ' ', text)  # Remove punctuation
+    text = re.sub(r'\s+', ' ', text)  # Remove extra spaces
+    text = text.replace("'", '')  # Remove apostrophes
     preprocessed_text = text.split()  # Split into words
     return preprocessed_text
 
@@ -95,22 +96,8 @@ def main():
 
     vectorized_training_data, training_labels = vectorize_text(training_data, vocab)
     vectorized_test_data, test_labels = vectorize_text(test_data, vocab)
-
-    # Divide the training data into four equal parts
-    parts = len(vectorized_training_data) // 4
     
     classifier = BayesClassifier()
-
-    for i in range(4):
-        # Concatenate the parts up to and including the i'th part
-        incremental_data = vectorized_training_data[:(i+1)*parts]
-        incremental_labels = training_labels[:(i+1)*parts]
-
-        classifier.train(incremental_data, incremental_labels, vocab)
-
-        predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
-
-        print(f"Accuracy after training on parts 1-{i+1}: ", accuracy(predicted_labels, test_labels))
         
     for i, section in enumerate(classifier.file_sections):
         # Use the section as an index for incremental training
@@ -119,10 +106,13 @@ def main():
 
         classifier.train(incremental_data, incremental_labels, vocab)
 
-        predicted_labels = classifier.classify_text(vectorized_test_data, vocab)
+        predicted_training_labels = classifier.classify_text(vectorized_training_data, vocab)
+        
+        predicted_testing_labels = classifier.classify_text(vectorized_test_data, vocab)
+        
+        print(f"Accuracy on trainingSet parts 1-{i+1}: ", accuracy(predicted_training_labels, training_labels))
 
-        print(f"Accuracy after training on parts 1-{i+1}: ", accuracy(predicted_labels, test_labels))
-    
+        print(f"Accuracy on testSet parts 1-{i+1}: ", accuracy(predicted_testing_labels, test_labels))
 
     return 1
 
