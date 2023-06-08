@@ -91,11 +91,53 @@ def main():
         test_data = f.read()
 
     preprocessed_training_data = process_text(training_data)
+    preprocessed_testing_data = process_text(test_data)
 
     vocab = build_vocab(preprocessed_training_data)
 
     vectorized_training_data, training_labels = vectorize_text(training_data, vocab)
     vectorized_test_data, test_labels = vectorize_text(test_data, vocab)
+    
+    # Writing preprocessed training data
+    with open("preprocessed_train.txt", "w") as f:
+        # Write the vocab
+        for word in vocab:
+            f.write(word + ',')
+        f.write('classlabel\n')
+
+        # Write the vectors and labels
+        for i in range(len(vectorized_training_data)):
+            vector = vectorized_training_data[i]
+            label = training_labels[i]
+            
+            # Write the vector
+            for word in vocab:
+                if word in vector:
+                    f.write('1,')
+                else:
+                    f.write('0,')
+            
+            # Write the label
+            f.write(str(label) + '\n')
+
+    # Writing preprocessed testing data
+    with open("preprocessed_test.txt", "w") as f:
+        for word in vocab:
+            f.write(word + ',')
+        f.write('classlabel\n')
+
+        for i in range(len(vectorized_test_data)):
+            vector = vectorized_test_data[i]
+            label = test_labels[i]
+            
+            for word in vocab:
+                if word in vector:
+                    f.write('1,')
+                else:
+                    f.write('0,')
+            
+            f.write(str(label) + '\n')
+
     
     classifier = BayesClassifier()
         

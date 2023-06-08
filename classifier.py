@@ -82,7 +82,6 @@ class BayesClassifier():
 
             for word in sentence:
                 #add to the total positive and negative log probability
-                #Laplace smoothing 
                 word_positive_probability = (self.postive_word_counts[word] + 1) / (self.total_positive_words + self.vocabulary_length)
                 word_negative_probability = (self.negative_word_counts[word] + 1) / (self.total_negative_words + self.vocabulary_length)
 
